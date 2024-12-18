@@ -2,6 +2,11 @@
   border: 1px solid red;
 } */
 
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
 .bg {
   background-color: #141415;
   color: white;
@@ -67,6 +72,32 @@
   border: 1px solid #252528;
   height: 25px;
   width: 25px;
+}
+
+.cell[data-col="2"],
+.cell[data-col="5"],
+.cell[data-col="8"],
+.cell[data-col="11"],
+.cell[data-col="14"],
+.cell[data-col="17"],
+.cell[data-col="20"],
+.cell[data-col="23"],
+.cell[data-col="26"],
+.cell[data-col="29"] {
+  border-right-width: 2px;
+}
+
+.cell[data-row="2"],
+.cell[data-row="5"],
+.cell[data-row="8"],
+.cell[data-row="11"],
+.cell[data-row="14"],
+.cell[data-row="17"],
+.cell[data-row="20"],
+.cell[data-row="23"],
+.cell[data-row="26"],
+.cell[data-row="29"] {
+  border-bottom-width: 3px;
 }
 
 .cell--active {
