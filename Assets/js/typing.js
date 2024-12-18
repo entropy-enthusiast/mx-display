@@ -1,5 +1,9 @@
+// [rows, columns]
+const gridSize = [64, 32];
+
 // Pixel font definitions (5x5 for selected characters)
 const fontMap = {
+  0: ["00000", "00000", "00000", "00000", "00000"],
   A: ["01110", "10001", "11111", "10001", "10001"],
   B: ["11110", "10001", "11110", "10001", "11110"],
   C: ["01110", "10001", "10000", "10001", "01110"],
@@ -27,3 +31,42 @@ const fontMap = {
   Y: ["10001", "01010", "00100", "00100", "00100"],
   Z: ["11111", "00010", "00100", "01000", "11111"]
 };
+
+// From what cell typing starts
+const start = 0;
+
+// Font size
+const step = 6;
+
+let chunk = [];
+
+for (let r=start; r<gridSize[0]-step; r+=step) {
+  let row = [r, r+5];
+  for (let c=start; c<gridSize[1]-step; c+=step) {
+    let col = [c, c+5];
+    chunk.push([row, col]);
+  }
+}
+
+function handleTyping(k, letter) {
+  for (let i=chunk[k][0][0]; i<chunk[k][0][1]; i++) {
+    for (let j=chunk[k][1][0]; j<chunk[k][1][1]; j++) {
+      if (fontMap[letter][i-chunk[k][0][0]][j-chunk[k][1][0]] === "1") {
+        $(`.cell[data-row="${i}"][data-col="${j}"]`).addClass("cell--active");
+      } else {
+        $(`.cell[data-row="${i}"][data-col="${j}"]`).removeClass("cell--active");
+      }
+    }
+  }
+}
+
+$(document).ready(() => {
+  $(".textbox").on("input", ({target}) => {
+    let input = $(target).val().toUpperCase().replace(/\s/g, '');
+    let letters = [...input.split(''), ...Array(chunk.length - input.length).fill("0")];
+  
+    for (let i=0; i<letters.length; i++) {
+      handleTyping(i, letters[i]);
+    }
+  });
+});
