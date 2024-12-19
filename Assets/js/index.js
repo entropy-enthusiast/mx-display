@@ -109,3 +109,8 @@ $(document).ready(() => {
     $(".grid").off("mouseenter", ".cell");
   });
 });
+
+$(".copy").on("click", () => {
+  let txt = $("#binaryOutput").html().replaceAll("<br>", "\r\n");
+  navigator.clipboard.writeText(txt);
+});

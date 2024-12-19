@@ -173,6 +173,11 @@ a {
   width: var(--grid-width);
 }
 
+.output__click {
+  display: flex;
+  gap: 1rem;
+}
+
 .output-btn {
   background-color: #1A1A1D;
   border: 2px solid rgba(194, 194, 194, .05);
@@ -201,21 +206,20 @@ a {
 }
 
 .copy {
-  background-color: rgba(255, 255, 255, .05);
-  border: none;
+  background-color: #1A1A1D;
+  border: 2px solid rgba(194, 194, 194, .05);
   border-radius: 3px;
   cursor: pointer;
-  padding: .3rem .4rem;
+  padding: .3rem .5rem;
   padding-top: .4rem;
-  position: absolute;
   right: .5rem;
   top: .5rem;
 }
 
-.copy:active {
-  background-color: rgba(255, 255, 255, .1);
+.copy:active > .copy__img {
+  opacity: .5;
 }
 
 .copy__img {
-  width: 17px;
+  width: 1.3rem;
 }
