@@ -133,6 +133,7 @@ a {
   background-color: #1A1A1D;
   border: 1px solid #252528;
   height: 25px;
+  outline: none !important;
   width: 25px;
 }
 
