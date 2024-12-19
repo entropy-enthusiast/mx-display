@@ -25,6 +25,9 @@ const gridRows = 64;
 const gridCols = 32;
 
 function updateBinaryPatterns() {
+
+  binaryOutput.innerHTML = "";
+
   // Display the first binary pattern (1 to 64), each pattern has 64 bits
   for (let row = 0; row < gridRows; row++) {
     let binaryPattern = "0b"; // Adding the prefix "0b"

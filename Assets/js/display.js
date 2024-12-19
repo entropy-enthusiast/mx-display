@@ -35,6 +35,7 @@ document.addEventListener('keydown', (event) => {
     default:
       return; // Ignore other keys
   }
+
   processImageOverlay(currentImage); // Reprocess image overlay with updated offsets
 });
 
