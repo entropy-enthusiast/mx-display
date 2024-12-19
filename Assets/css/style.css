@@ -223,3 +223,38 @@ a {
 .copy__img {
   width: 1.3rem;
 }
+
+@media screen and (max-width: 480px) {
+  .title {
+    margin-bottom: 1.3rem;
+  }
+
+  .tab-link {
+    font-size: .7rem;
+    padding: .5rem;
+  }
+
+  .main {
+    align-items: flex-start;
+    overflow-x: scroll;
+  }
+
+  .img-upload {
+    box-sizing: border-box;
+    width: 100%;
+  }
+
+  .output {
+    width: 100%;
+  }
+
+  .output-btn {
+    font-size: .7rem;
+  }
+
+  #binaryOutput {
+    padding: .7rem 1rem;
+    font-size: .8rem;
+    overflow-x: scroll;
+  }
+}
