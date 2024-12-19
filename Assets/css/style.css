@@ -88,6 +88,42 @@ a {
   outline: none;
 }
 
+.img-upload {
+  align-items: center;
+  background-color: #151F28;
+  border: 2px dashed #2185D5;
+  border-radius: 5px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  gap: .5rem;
+  justify-content: center;
+  min-height: 12rem;
+  width: var(--grid-width)
+}
+
+.image-upload__txt {
+  color: #2185D5;
+  font-size: 12px;
+  margin: 0;
+}
+
+.underline {
+  text-decoration: underline;
+}
+
+#hiddenCanvas {
+  display: none;
+}
+
+.input-img {
+  opacity: 0;
+  pointer-events: none;
+  position: absolute;
+  top: 0;
+}
+
 .grid {
   display: grid;
   grid-template-columns: repeat(32, 1fr);
@@ -128,4 +164,58 @@ a {
 
 .cell--active {
   background-color: #2185D5;
+}
+
+.output {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  width: var(--grid-width);
+}
+
+.output-btn {
+  background-color: #1A1A1D;
+  border: 2px solid rgba(194, 194, 194, .05);
+  border-radius: 5px;
+  color: #D0D0D1;
+  cursor: pointer;
+  font-family: var(--default-font);
+  font-size: 16px;
+  padding: .5rem .75rem;
+  width: max-content;
+}
+
+.output-btn:active {
+  border-color: rgba(194, 194, 194, .1);
+}
+
+#binaryOutput {
+  background-color: #1A1A1D;
+  box-sizing: border-box;
+  color: rgba(255, 255, 255, .65);
+  font-family: "Roboto Mono";
+  letter-spacing: 0.18em;
+  padding: 1rem 1.3rem;
+  position: relative;
+  visibility: hidden;
+}
+
+.copy {
+  background-color: rgba(255, 255, 255, .05);
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
+  padding: .3rem .4rem;
+  padding-top: .4rem;
+  position: absolute;
+  right: .5rem;
+  top: .5rem;
+}
+
+.copy:active {
+  background-color: rgba(255, 255, 255, .1);
+}
+
+.copy__img {
+  width: 17px;
 }

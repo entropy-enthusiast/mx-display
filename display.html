@@ -19,19 +19,23 @@
   <nav class="menu-bar">
     <ul class="tab-list">
       <li class="tab-item">
-        <a class="tab-link--active tab-link" href="index.html">Typing mode</a>
+        <a class="tab-link" href="index.html">Typing mode</a>
       </li>
       <li class="tab-item">
         <a class="tab-link">Camera mode</a>
       </li>
       <li class="tab-item">
-        <a class="tab-link" href="display.html">Display mode</a>
+        <a class="tab-link tab-link--active" href="display.html">Display mode</a>
       </li>
     </ul>
   </nav>
 
   <main class="main">
-    <textarea class="textbox" placeholder="Type something..."></textarea>
+    <div class="img-upload">
+      <img src="Assets/Images/image.png" alt="image icon">
+      <p class="image-upload__txt">Drag and Drop file here or <span class="underline">Choose file</span></p>
+    </div>
+    <input type="file" class="input-img" id="imageUpload" accept="image/*">
     <div class="grid">
     </div>
     <div class="output">
@@ -42,6 +46,7 @@
         </button>
       </div>
     </div>
+    <canvas id="hiddenCanvas" width="640" height="1280"></canvas>
   </main>
 
   <footer>
@@ -50,7 +55,7 @@
 
     <!-- Local JS -->
     <script src="Assets/js/index.js"></script>
-    <script src="Assets/js/typing.js"></script>
+    <script src="Assets/js/display.js"></script>
   </footer>
 </body>
 </html>

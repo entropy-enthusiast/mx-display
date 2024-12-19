@@ -1,3 +1,5 @@
+const cells = []
+
 function createGrid() {
   let cloneBtn = (r, c) => {
     return `<button class="cell" data-row="${r}" data-col="${c}"></button>`;
@@ -5,11 +7,34 @@ function createGrid() {
   
   $(".grid").empty();
 
-  for (let row=0; row<32; row++) {
+  for (let row=0; row<64; row++) {
+    cells[row] = [];
     for (let col=0; col<32; col++) {
       $(".grid").append(cloneBtn(row, col));
+      cells[row][col] = $(`.cell[data-row=${row}][data-col="${col}"]`);
     }
   }
+}
+
+createGrid();
+
+// Update binary patterns dynamically
+const binaryOutput = document.getElementById('binaryOutput');
+const cellSize = 20;
+const gridRows = 64;
+const gridCols = 32;
+
+function updateBinaryPatterns() {
+  // Display the first binary pattern (1 to 64), each pattern has 64 bits
+  for (let row = 0; row < gridRows; row++) {
+    let binaryPattern = "0b"; // Adding the prefix "0b"
+    for (let col = 0; col < gridCols; col++) {
+      binaryPattern += cells[row][col].hasClass('cell--active') ? "1" : "0";
+    }
+    binaryOutput.innerHTML += `${binaryPattern},<br>`;
+  }
+
+  binaryOutput.style.visibility = "visible";
 }
 
 $(document).ready(() => {
@@ -80,6 +105,4 @@ $(document).ready(() => {
     // Remove the mouseenter handler when mouse is up to prevent unnecessary event bindings
     $(".grid").off("mouseenter", ".cell");
   });
-  
-  createGrid();
 });
