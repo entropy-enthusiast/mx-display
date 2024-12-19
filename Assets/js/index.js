@@ -16,8 +16,6 @@ function createGrid() {
   }
 }
 
-createGrid();
-
 // Update binary patterns dynamically
 const binaryOutput = document.getElementById('binaryOutput');
 const cellSize = 20;
@@ -41,6 +39,9 @@ function updateBinaryPatterns() {
 }
 
 $(document).ready(() => {
+
+  createGrid();
+  updateBinaryPatterns();
 
   // Tabs state management
   $(".tab-link").on("click", ({target}) => {
@@ -111,6 +112,24 @@ $(document).ready(() => {
 });
 
 $(".copy").on("click", () => {
-  let txt = $("#binaryOutput").html().replaceAll("<br>", "\r\n");
+  const txt = $("#binaryOutput").html().replaceAll("<br>", "\r\n");
   navigator.clipboard.writeText(txt);
+});
+
+$("#postBtn").on("click", () => {
+  const txt = $("#binaryOutput").html().replaceAll("<br>", "\r\n");
+
+  fetch('https://jsonplaceholder.typicode.com/posts', {
+    method: 'POST',
+    body: JSON.stringify({
+      title: 'binary',
+      body: txt,
+      userId: 1,
+    }),
+    headers: {
+      'Content-type': 'application/json; charset=UTF-8',
+    },
+  })
+    .then((response) => response.json())
+    .then((json) => console.log(json));
 });
