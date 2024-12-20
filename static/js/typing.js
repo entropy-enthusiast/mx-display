@@ -59,27 +59,33 @@ function drawLetter(letter, row, col) {
   }
 }
 
-document.addEventListener("keydown", ({key}) => {
-  if (key === "Backspace") {
+let previousValue = $(".textbox").val();
+
+document.addEventListener("input", () => {
+  const currentValue = $(".textbox").val();
+
+  if (currentValue.length < previousValue.length) {
     $(".cell.cell--active").removeClass("cell--active");
     currentRow = 0;
     currentCol = 0;    
-
-    let txt = $(".textbox").val().slice(0, -1);
+  
+    let txt = $(".textbox").val();
     for (let i=0; i<txt.length; i++) {
       if (txt[i] === "\n") {
-        type("Enter");
+        type("\n");
       } else {
         type(txt[i]);
       }
     }
   } else {
-    type(key);
+    type($(".textbox").val().at(-1));
   }
+
+  previousValue = currentValue;
 });
 
 function type(key) {
-  if (key === "Enter") {
+  if (key === "\n") {
     currentRow += letterHeight + 1;
     currentCol = 0;
   }  else if (key === " ") {
