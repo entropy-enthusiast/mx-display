@@ -145,6 +145,10 @@ window.addEventListener('keydown', (event) => {
   }
 });
 
+$(".arrow").on("click", ({target}) => {
+  arrowsMove($(target).attr("data-dir"));
+});
+
 // Handle keyboard arrow key presses to shift the overlay
 document.addEventListener('keydown', (event) => {
   arrowsMove(event.key);
