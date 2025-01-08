@@ -34,8 +34,6 @@ function updateBinaryPatterns() {
     }
     binaryOutput.innerHTML += `${binaryPattern},<br>`;
   }
-
-  binaryOutput.style.visibility = "visible";
 }
 
 $(document).ready(() => {
