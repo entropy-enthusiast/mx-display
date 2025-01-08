@@ -115,6 +115,15 @@ $(document).ready(() => {
 
     updateBinaryPatterns();
   });
+
+  $("#clearBtn").on("click", () => {
+    $(".cell--active").each((i, cell) => {
+      $(cell).removeClass("cell--active");
+    });
+
+    updateBinaryPatterns();
+  });
+
 });
 
 $(".copy").on("click", () => {

@@ -207,6 +207,14 @@ a {
   visibility: hidden;
 }
 
+.post-btn__icon {
+  width: 1.1rem;
+  margin-left: .3rem;
+  opacity: .8;
+  position: relative;
+  top: .2rem;
+}
+
 .copy {
   background-color: #1A1A1D;
   border: 2px solid rgba(194, 194, 194, .05);

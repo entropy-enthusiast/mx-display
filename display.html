@@ -42,18 +42,20 @@
       <button class="output-btn arrow" data-dir="ArrowLeft">Left</button>
       <button class="output-btn arrow" data-dir="ArrowRight">Right</button>
     </div>
+    <div class="arrows output__click">
+      <button class="output-btn" id="postBtn">
+        Post
+        <img class="post-btn__icon" src="static/images/share.png" alt="share arrow">
+      </button>
+      <button class="output-btn" id="clearBtn">
+        Clear
+        <img class="post-btn__icon" src="static/images/refresh.png" alt="refresh arrows">
+      </button>
+    </div>
     <div class="grid">
     </div>
     <div class="output">
-      <div class="output">
-        <div class="output__click">
-          <button class="output-btn" id="postBtn">Post</button>
-          <button class="copy">
-            <img class="copy__img" src="static/Images/copy.png" alt="copy icon">
-          </button>
-        </div>
-        <div id="binaryOutput">
-      </div>
+      <div id="binaryOutput">
     </div>
     <canvas id="hiddenCanvas" width="640" height="1280"></canvas>
   </main>
