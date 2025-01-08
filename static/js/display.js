@@ -72,6 +72,7 @@ function processImageOverlay(img) {
 
   // Update binary patterns after shifting
   updateBinaryPatterns();
+  $("#postBtn").click();
 }
 
 function dropHandler(ev) {

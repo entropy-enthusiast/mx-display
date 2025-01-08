@@ -300,3 +300,7 @@ a {
     overflow-x: scroll;
   }
 }
+
+.display--none {
+  display: none;
+}
