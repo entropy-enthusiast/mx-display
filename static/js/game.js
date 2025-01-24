@@ -1,7 +1,7 @@
 // General variables
 
 const spaceShipDesigns = [
-  ["000001000", "000111000", "001111100", "011111110", "0111111111", "100111001"]
+  ["100111001", "1111111111", "011111110", "001111100", "000111000", "000010000",]
 ]
 
 let gameIsOn = true;
@@ -72,6 +72,25 @@ class Asteroid {
 class SpaceShip {
   constructor(design) {
     this.design = design;
+    this.height = design.length;
+    this.width = design[0].length;
+    this.xPos = Math.floor((32 - this.width) / 2);
+    this.yPos = 60;
+  }
+
+  // Need a better way to draw. Consider letting spaceship move out of bounds (appear from the other side). 
+  // Records each (x, y) coordinate. Make the design a char array (whatever is best). 
+  draw() {
+    for (let i=0; i<this.height; i++) {
+      for (let j=0; j<this.width; j++) {
+        const y = this.yPos - i;
+        const x = this.xPos + j;
+
+        if (this.design[i][j] === "1") {
+          cells[y][x].addClass("cell--active");
+        }
+      }
+    }
   }
 }
 
@@ -88,7 +107,7 @@ $(document).ready(() => {
 });
 
 async function startAsteroidShower() {
-  await delay(500); // To allow the page to load
+  await delay(500); // Allows the grid to load
 
   let step = 0;
   let size = 2;
@@ -123,6 +142,11 @@ async function startAsteroidShower() {
 }
 
 async function initializeSpaceShip() {
+  await delay(2000) // Allows the grid to load;
+
+  const spaceShip = new SpaceShip(spaceShipDesigns[0]);
+  spaceShip.draw();
+
   while (gameIsOn) {
     await delay(100);
     console.log(123);
