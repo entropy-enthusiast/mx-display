@@ -1,3 +1,11 @@
+// General variables
+
+const spaceShipDesigns = [
+  ["000001000", "000111000", "001111100", "011111110", "0111111111", "100111001"]
+]
+
+let gameIsOn = true;
+
 // General functions
 
 function getRandomInt(min=0, max) {
@@ -15,8 +23,8 @@ function delay(millisec) {
 // Game classes
 
 class Asteroid {
-  constructor() {
-    this.xPos = getRandomInt(0, 32);
+  constructor(xPos) {
+    this.xPos = xPos;
     this.yPos = -1;
     this.outOfBounds = false;
   }
@@ -40,6 +48,19 @@ class Asteroid {
     } else {
       this.outOfBounds = true;
     }
+
+    // add some delay more than that of regular game delay.
+  }
+
+  static createAsteroidCoords(startPos, size) {
+    const xPos = [];
+    for (let i=0; i<size; i++) {
+      if (getRandomInt(0, 6) != 1) {
+        xPos.push(startPos + i);
+      }
+    }
+
+    return xPos;
   }
 
   static cleanSpace(oldAsteroidBelt) {
@@ -48,9 +69,13 @@ class Asteroid {
   }
 }
 
-// Game procedure
+class SpaceShip {
+  constructor(design) {
+    this.design = design;
+  }
+}
 
-let gameIsOn = true;
+// Game procedure
 
 $(document).ready(() => {
 
@@ -58,24 +83,33 @@ $(document).ready(() => {
     gameIsOn = false;
   });
 
-  executeGame();
+  startAsteroidShower();
+  initializeSpaceShip();
 });
 
-async function executeGame() {
+async function startAsteroidShower() {
   await delay(500); // To allow the page to load
 
   let step = 0;
-  let speed = 100;
+  let size = 2;
+  let startPos = getRandomInt(0, 32-size);
   let asteroids = [];
 
   while (gameIsOn) {
     step++;
 
-    await delay(speed); // game speed
+    await delay(500);
 
-    // Create asteroids
-    const rock = new Asteroid();
-    asteroids.push(rock);
+    // Create rock coordinates
+    if (step % size === 0) {
+      startPos = getRandomInt(0, 32-size);
+    }
+
+    const xCoords = Asteroid.createAsteroidCoords(startPos, size);
+    xCoords.forEach(x => {
+      const rock = new Asteroid(x);
+      asteroids.push(rock);
+    });
 
     // Move asteroids
     asteroids.forEach(asteroid => {
@@ -86,4 +120,11 @@ async function executeGame() {
     asteroids = Asteroid.cleanSpace(asteroids);
   }
   console.log("Game Over!");
+}
+
+async function initializeSpaceShip() {
+  while (gameIsOn) {
+    await delay(100);
+    console.log(123);
+  }
 }
