@@ -50,6 +50,7 @@ const spaceShipSkin = {
 }
 
 let gameIsOn = true;
+let asteroids = [];
 
 // General functions
 
@@ -145,9 +146,6 @@ class SpaceShip {
   }
 
   move(key) {
-
-    console.log(key);
-
     for (let h=0; h<this.height; h++) {
       for (let w=0; w<this.width; w++) {
         const x = this.coords[h][w][0];
@@ -157,12 +155,24 @@ class SpaceShip {
           cells[y][x].removeClass("cell--active");
         }
 
-        let newX = x + 1;
-        if (newX > 31) {
-          newX = 0;
+        let newX;
+        if (key === 68) {
+          newX = x + 1;
+          if (newX > 31) {
+            newX = 0;
+          }
+        } else if (key === 65) {
+          newX = x - 1;
+          if (newX < 0) {
+            newX = 31;
+          }
+        } else {
+          return;
         }
 
-        this.coords[h][w] = [newX, y];
+        if (gameIsOn) {
+          this.coords[h][w] = [newX, y];
+        }
       }
     }
 
@@ -187,22 +197,21 @@ $(document).ready(() => {
     gameIsOn = false;
   });
 
-  startAsteroidShower();
-  initializeSpaceShip();
+  handleAsteroids();
+  handleSpaceShip();
 });
 
-async function startAsteroidShower() {
+async function handleAsteroids() {
   await delay(500); // Allows the grid to load
 
   let step = 0;
   let size = 2;
   let startPos = getRandomInt(0, 32 - size);
-  let asteroids = [];
 
   while (gameIsOn) {
     step++;
 
-    await delay(500);
+    await delay(50);
 
     // Create rock coordinates
     if (step % size === 0) {
@@ -223,12 +232,11 @@ async function startAsteroidShower() {
     // Delete asteroids that go out of the grid
     asteroids = Asteroid.cleanSpace(asteroids);
   }
-  console.log("Game Over!");
 }
 
-async function initializeSpaceShip() {
+async function handleSpaceShip() {
   await delay(2000) // Allows the grid to load;
-  
+
   const spaceShip = new SpaceShip(spaceShipSkin['A']);
 
   $(document).on("keydown", ({which}) => {
@@ -237,5 +245,28 @@ async function initializeSpaceShip() {
 
   while (gameIsOn) {
     await delay(100);
+
+    const rocks = asteroids.slice(10);
+    
+    rocks.forEach(rock => {
+      for (let h=0; h<spaceShip.height; h++) {
+        for (let w=0; w<spaceShip.width; w++) {
+          const x = spaceShip.coords[h][w][0];
+          const y = spaceShip.coords[h][w][1];
+  
+          if (spaceShip.skin[h][w] === 1) {
+            if (rock.yPos === y) {
+              if (rock.xPos === x) {
+                console.log(cells[rock.yPos][rock.xPos]);
+                gameIsOn = false;
+                return;
+              }
+            }
+          }
+        }
+      }  
+    });
   }
+
+  console.log("Game Over!");
 }
