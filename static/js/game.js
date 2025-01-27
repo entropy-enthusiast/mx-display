@@ -54,7 +54,7 @@ let spaceShipSkin = {
     ],
     front: {
       y: [4, 2, 3, 3, 1, 0, 1, 3, 3, 2, 4],
-      x: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+      x: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
     }
   },
 }
@@ -90,8 +90,8 @@ class Asteroid {
     cells[this.yPos][this.xPos].addClass("cell--active");
   }
 
-  erase() {
-    cells[this.yPos][this.xPos].removeClass("cell--active");
+  erase(x=this.xPos, y=this.yPos) {
+    cells[y][x].removeClass("cell--active");
   }
 
   move() {
@@ -228,8 +228,8 @@ class Bullet {
     cells[this.yPos][this.xPos].addClass("cell--active");
   }
 
-  erase() {
-    cells[this.yPos][this.xPos].removeClass("cell--active");
+  erase(x=this.xPos, y=this.yPos) {
+    cells[y][x].removeClass("cell--active");
   }
 
   move() {
@@ -313,7 +313,7 @@ async function handleSpaceShip() {
   });
 
   while (gameIsOn) {
-    await delay(100);
+    await delay(50);
 
     // Move bullets
     bullets.forEach(bullet => {
@@ -322,6 +322,31 @@ async function handleSpaceShip() {
 
     // Delete asteroids that go out of the grid
     bullets = Bullet.cleanSpace(bullets);    
+
+    // Handle collisions
+    const asteroidsCopy = [...asteroids];
+    const bulletsCopy = [...bullets];
+
+    for (let i = 0; i < asteroidsCopy.length; i++) {
+      const aX = asteroidsCopy[i].xPos;
+      const aY = asteroidsCopy[i].yPos;
+
+      for (let j = 0; j < bulletsCopy.length; j++) {
+        bX = bulletsCopy[j].xPos
+        bY = bulletsCopy[j].yPos;
+        if ((aX === bX) && (aY === bY)) {
+          asteroids = asteroids.filter((_, index) => index != i);
+          bullets = bullets.filter((_, index) => index != j);
+
+          cells[bY][bX].removeClass("cell--active");
+        }
+      }
+
+      for (let k=0; k < spaceShipSkin["A"]["front"]["x"].length; k++) {
+        const sX = spaceShipSkin["A"]["front"]["x"][k];
+        const sY = spaceShipSkin["A"]["front"]["y"][k];
+      }
+    }
   }
 
   console.log("Game Over!");
