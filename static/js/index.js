@@ -144,6 +144,8 @@ $(".copy").on("click", () => {
 $("#postBtn").on("click", () => {
   const txt = $("#binaryOutput").html().replaceAll("<br>", "\r\n");
 
+  console.log(txt);
+
   fetch('/update', {
     method: 'POST',
     body: JSON.stringify({

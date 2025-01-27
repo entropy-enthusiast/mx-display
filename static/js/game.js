@@ -39,6 +39,35 @@ createGrid();
 
 // Starting variables
 
+const numbers = {
+  0: ["01110", "10001", "10001", "10001", "10001", "10001", "10001", "01110"],
+  1: ["00100", "01100", "10100", "00100", "00100", "00100", "00100", "11111"],
+  2: ["11111", "00001", "00001", "11111", "10000", "10000", "10000", "11111"],
+  3: ["11111", "00001", "00001", "11111", "00001", "00001", "00001", "11111"],
+  4: ["10000", "10000", "10100", "10100", "11111", "00100", "00100", "00100"],
+  5: ["11111", "10000", "10000", "10000", "11111", "00001", "00001", "11111"],
+  6: ["11111", "10000", "10000", "11111", "10001", "10001", "10001", "11111"],
+  7: ["11111", "00001", "00010", "00100", "00100", "00100", "00100", "00100"],
+  8: ["01111", "01001", "01001", "11111", "10001", "10001", "10001", "11111"],
+  9: ["11111", "10001", "11111", "00001", "00001", "00001", "00001", "00001"],
+  x: 10,
+  y: 47
+}
+
+const scoreText = {
+  font: [
+    "01111001110001110011110011111000",
+    "10000010001010001010001010000000",
+    "01110010000010001011110011110000",
+    "00001010001010001010010010000000",
+    "11110001110001110010001011111000",
+  ],
+  y: 57,
+  x: 2
+}
+
+const strip = { y: [43, 44] };
+
 let spaceShipSkin = {
   A: {
     body: [
@@ -53,9 +82,9 @@ let spaceShipSkin = {
       [0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0]
     ],
     weapons: [
-      [53, 11],
-      [53, 19],
-      [52, 15]
+      [34, 11],
+      [34, 19],
+      [31, 15]
     ],
     front: {
       y: [4, 2, 3, 3, 1, 0, 1, 3, 3, 2, 4],
@@ -66,7 +95,10 @@ let spaceShipSkin = {
 
 let gameIsOn = true;
 let asteroids = [];
+let asteroidSpeed = 500;
 let bullets = [];
+let firstLoad = true;
+let score = 0;
 
 // General functions
 
@@ -104,7 +136,7 @@ class Asteroid {
       this.erase();
     }
 
-    if (this.yPos < 63) {
+    if (this.yPos < 42) {
       this.yPos += 1;
       this.draw();
     } else {
@@ -136,7 +168,7 @@ class SpaceShip {
     this.width = this.skin[0].length;
 
     this.xStart = Math.floor((32 - this.width) / 2); // The center of the grid
-    this.yStart = 60;
+    this.yStart = 40;
     this.coords = this.setSpawn(this.skin);
 
     this.weapons = skin["weapon"];
@@ -264,12 +296,22 @@ $(document).ready(() => {
     gameIsOn = false;
   });
 
-  handleAsteroids();
-  handleSpaceShip();
+  $("#restartBtn").on("click", () => {
+    location.reload();
+  })
+
+  $("#startBtn").on("click", () => {
+    if (firstLoad) {
+      handleAsteroids();
+      handleSpaceShip();  
+    }
+
+    firstLoad = false;
+  });
 });
 
 async function handleAsteroids() {
-  await delay(500); // Allows the grid to load
+  // await delay(500); // Allows the grid to load
 
   let step = 0;
   let size = 2;
@@ -278,7 +320,7 @@ async function handleAsteroids() {
   while (gameIsOn) {
     step++;
 
-    await delay(500);
+    await delay(asteroidSpeed);
 
     // Create rock coordinates
     if (step % size === 0) {
@@ -301,8 +343,56 @@ async function handleAsteroids() {
   }
 }
 
+function updateScore(score=0) {
+  let scoreInput;
+
+  if (score > 99) {
+    numbers.x = 7;
+  } else {
+    numbers.x = 10;
+  }
+
+  if (score < 10) {
+    scoreInput = ["0", score.toString().split("")];
+  } else {
+    scoreInput = score.toString().split("");
+  }
+
+  for (let i=0; i<8; i++) {
+    for (let j=0; j<20; j++) {
+      cells[numbers.y + i][numbers.x + j].removeClass("cell--active");
+    }
+  }
+
+  scoreInput.forEach((number, k) => {
+    numbers[number].forEach((txt, i) => {
+      for (let j=0; j<txt.length; j++) {
+        if (txt[j] === "1") {
+          cells[numbers.y + i][numbers.x + k*6 + j].addClass("cell--active");
+        }
+      }
+    })
+  });
+}
+
 async function handleSpaceShip() {
-  await delay(2000) // Allows the grid to load;
+  // await delay(2000) // Allows the grid to load;
+
+  scoreText.font.forEach((txt, i) => {
+    for (let j=0; j<txt.length; j++) {
+      if (txt[j] === "1") {
+        cells[scoreText.y + i][scoreText.x + j].addClass("cell--active");
+      }
+    }
+  });
+
+  updateScore();
+
+  strip.y.forEach(col => {
+    for (let i=0; i<32; i++) {
+      cells[col][i].addClass("cell--active");
+    }
+  });
 
   const spaceShip = new SpaceShip(spaceShipSkin['A']);
 
@@ -344,6 +434,12 @@ async function handleSpaceShip() {
           bullets = bullets.filter((_, index) => index != j);
 
           cells[bY][bX].removeClass("cell--active");
+          score += 1;
+          updateScore(score);
+
+          if (asteroidSpeed > 0) {
+            asteroidSpeed -= 1;
+          }
         }
       }
 
@@ -361,6 +457,4 @@ async function handleSpaceShip() {
       }
     }
   }
-
-  console.log("Game Over!");
 }
