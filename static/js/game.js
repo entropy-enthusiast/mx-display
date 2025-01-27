@@ -35,22 +35,33 @@ createGrid();
 
 // Starting variables
 
-const spaceShipSkin = {
-  A: [
-    [0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0],
-    [0, 1, 0, 0, 1, 1, 1, 0, 0, 1, 0], 
-    [0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0], 
-    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-    [0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0], 
-    [0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0],
-    [0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0]
-  ],
+let spaceShipSkin = {
+  A: {
+    body: [
+      [0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0],
+      [0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0],
+      [0, 1, 0, 0, 1, 1, 1, 0, 0, 1, 0], 
+      [0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0], 
+      [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+      [0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0],
+      [0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0], 
+      [0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0],
+      [0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0]
+    ],
+    weapons: [
+      [53, 11],
+      [53, 19]
+    ],
+    front: {
+      y: [4, 2, 3, 3, 1, 0, 1, 3, 3, 2, 4],
+      x: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+    }
+  },
 }
 
 let gameIsOn = true;
 let asteroids = [];
+let bullets = [];
 
 // General functions
 
@@ -94,8 +105,6 @@ class Asteroid {
     } else {
       this.outOfBounds = true;
     }
-
-    // add some delay more than that of regular game delay.
   }
 
   static createAsteroidCoords(startPos, size) {
@@ -117,13 +126,15 @@ class Asteroid {
 
 class SpaceShip {
   constructor(skin) {
-    this.skin = skin;
-    this.height = skin.length;
-    this.width = skin[0].length;
+    this.skin = skin["body"];
+    this.height = this.skin.length;
+    this.width = this.skin[0].length;
 
     this.xStart = Math.floor((32 - this.width) / 2); // The center of the grid
     this.yStart = 60;
-    this.coords = this.setSpawn(skin);
+    this.coords = this.setSpawn(this.skin);
+
+    this.weapons = skin["weapon"];
   }
 
   setSpawn() {
@@ -146,6 +157,23 @@ class SpaceShip {
   }
 
   move(key) {
+
+    if (key === 68) {
+      spaceShipSkin["A"]["weapons"].forEach((weapon, i) => {
+        spaceShipSkin["A"]["weapons"][i][1] = weapon[1] + 1;
+        if (weapon[1] > 31) {
+          spaceShipSkin["A"]["weapons"][i][1] = 0;
+        }
+      });
+    } else if (key === 65) {
+      spaceShipSkin["A"]["weapons"].forEach((weapon, i) => {
+        spaceShipSkin["A"]["weapons"][i][1] = weapon[1] - 1;
+        if (weapon[1] < 0) {
+          spaceShipSkin["A"]["weapons"][i][1] = 31;
+        }
+      });
+    }
+
     for (let h=0; h<this.height; h++) {
       for (let w=0; w<this.width; w++) {
         const x = this.coords[h][w][0];
@@ -189,6 +217,40 @@ class SpaceShip {
   }
 }
 
+class Bullet {
+  constructor(x, y) {
+    this.xPos = x;
+    this.yPos = y;
+    this.outOfBounds = false;
+  }
+
+  draw() {
+    cells[this.yPos][this.xPos].addClass("cell--active");
+  }
+
+  erase() {
+    cells[this.yPos][this.xPos].removeClass("cell--active");
+  }
+
+  move() {
+    if (this.yPos != -1) {
+      this.erase();
+    }
+
+    if (this.yPos > 0) {
+      this.yPos -= 1;
+      this.draw();
+    } else {
+      this.outOfBounds = true;
+    }
+  }
+
+  static cleanSpace(oldBullets) {
+    const cleanBullets = oldBullets.filter(bullet => !bullet.outOfBounds);
+    return cleanBullets;
+  }
+}
+
 // Game procedure
 
 $(document).ready(() => {
@@ -211,7 +273,7 @@ async function handleAsteroids() {
   while (gameIsOn) {
     step++;
 
-    await delay(50);
+    await delay(500);
 
     // Create rock coordinates
     if (step % size === 0) {
@@ -240,32 +302,26 @@ async function handleSpaceShip() {
   const spaceShip = new SpaceShip(spaceShipSkin['A']);
 
   $(document).on("keydown", ({which}) => {
-    spaceShip.move(which);
+    if (which === 32) {
+      spaceShipSkin["A"]["weapons"].forEach(weapon => {
+        const bullet = new Bullet(weapon[1], weapon[0]);
+        bullets.push(bullet);
+      });
+    } else {
+      spaceShip.move(which);
+    }
   });
 
   while (gameIsOn) {
     await delay(100);
 
-    const rocks = asteroids.slice(10);
-    
-    rocks.forEach(rock => {
-      for (let h=0; h<spaceShip.height; h++) {
-        for (let w=0; w<spaceShip.width; w++) {
-          const x = spaceShip.coords[h][w][0];
-          const y = spaceShip.coords[h][w][1];
-  
-          if (spaceShip.skin[h][w] === 1) {
-            if (rock.yPos === y) {
-              if (rock.xPos === x) {
-                console.log(cells[rock.yPos][rock.xPos]);
-                gameIsOn = false;
-                return;
-              }
-            }
-          }
-        }
-      }  
+    // Move bullets
+    bullets.forEach(bullet => {
+      bullet.move();
     });
+
+    // Delete asteroids that go out of the grid
+    bullets = Bullet.cleanSpace(bullets);    
   }
 
   console.log("Game Over!");
