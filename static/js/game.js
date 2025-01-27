@@ -2,6 +2,10 @@
 
 const cells = []
 
+// $(document).on("click", ({target}) => {
+//   console.log(target);
+// });
+
 function createGrid() {
   const totalRows = 64;
   const totalCols = 32;
@@ -50,7 +54,8 @@ let spaceShipSkin = {
     ],
     weapons: [
       [53, 11],
-      [53, 19]
+      [53, 19],
+      [52, 15]
     ],
     front: {
       y: [4, 2, 3, 3, 1, 0, 1, 3, 3, 2, 4],
@@ -345,6 +350,14 @@ async function handleSpaceShip() {
       for (let k=0; k < spaceShipSkin["A"]["front"]["x"].length; k++) {
         const sX = spaceShipSkin["A"]["front"]["x"][k];
         const sY = spaceShipSkin["A"]["front"]["y"][k];
+
+        const cX = spaceShip.coords[spaceShip.coords.length - 1 - sY][sX][0];
+        const cY = spaceShip.coords[spaceShip.coords.length - 1 - sY][sX][1];
+    
+        if ((cX === aX) && (cY === aY)) {
+          gameIsOn = false;
+          return;
+        }
       }
     }
   }
