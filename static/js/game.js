@@ -358,8 +358,9 @@ async function handleAsteroids() {
 
   while (gameIsOn) {
     step++;
-
     await delay(asteroidSpeed);
+
+    handleBinaryPattern();
 
     // Create rock coordinates
     if (step % size === 0) {
@@ -449,6 +450,8 @@ async function handleSpaceShip() {
   while (gameIsOn) {
     await delay(50);
 
+    handleBinaryPattern();
+
     // Move bullets
     bullets.forEach(bullet => {
       bullet.move();
@@ -499,10 +502,7 @@ async function handleSpaceShip() {
   }
 }
 
-async function handleBinaryPattern() {
-  while(gameIsOn) {
-    await delay(1000);
-    updateBinaryPatterns();
-    postBinaryPattern();
-  }
+function handleBinaryPattern() {
+  updateBinaryPatterns();
+  postBinaryPattern();
 }
