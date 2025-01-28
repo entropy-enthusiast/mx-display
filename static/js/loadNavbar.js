@@ -1,7 +1,7 @@
 const navItems = {
-  "Typing Mode": "index.html",
-  "Display Mode": "display.html",
-  "Game Mode": "game.html",
+  "Typing Mode": "/",
+  "Display Mode": "/display",
+  "Game Mode": "/game",
 }
 
 const constructNavbar = (items) => {
