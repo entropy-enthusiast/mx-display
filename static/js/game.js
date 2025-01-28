@@ -6,6 +6,40 @@ const cells = []
 //   console.log(target);
 // });
 
+function postBinaryPattern() {
+  const txt = $("#binaryOutput").html().replaceAll("<br>", "\r\n");
+
+  console.log(txt);
+
+  fetch('/update', {
+    method: 'POST',
+    body: JSON.stringify({
+      title: 'binary',
+      body: txt,
+      userId: 1,
+    }),
+    headers: {
+      'Content-type': 'application/json; charset=UTF-8',
+    },
+  })
+    .then((response) => response.json())
+    .then((json) => console.log(json));
+}
+
+function updateBinaryPatterns() {
+
+  binaryOutput.innerHTML = "";
+
+  // Display the first binary pattern (1 to 64), each pattern has 64 bits
+  for (let row = 0; row < gridRows; row++) {
+    let binaryPattern = "0b"; // Adding the prefix "0b"
+    for (let col = 0; col < gridCols; col++) {
+      binaryPattern += cells[row][col].hasClass('cell--active') ? "1" : "0";
+    }
+    binaryOutput.innerHTML += `${binaryPattern},<br>`;
+  }
+}
+
 function createGrid() {
   const totalRows = 64;
   const totalCols = 32;
@@ -99,6 +133,10 @@ let asteroidSpeed = 500;
 let bullets = [];
 let firstLoad = true;
 let score = 0;
+
+const binaryOutput = document.getElementById('binaryOutput');
+const gridRows = 64;
+const gridCols = 32;
 
 // General functions
 
@@ -303,7 +341,8 @@ $(document).ready(() => {
   $("#startBtn").on("click", () => {
     if (firstLoad) {
       handleAsteroids();
-      handleSpaceShip();  
+      handleSpaceShip();
+      // handleBinaryPattern();
     }
 
     firstLoad = false;
@@ -452,9 +491,18 @@ async function handleSpaceShip() {
     
         if ((cX === aX) && (cY === aY)) {
           gameIsOn = false;
+          console.log("Game Over!");
           return;
         }
       }
     }
+  }
+}
+
+async function handleBinaryPattern() {
+  while(gameIsOn) {
+    await delay(1000);
+    updateBinaryPatterns();
+    postBinaryPattern();
   }
 }
