@@ -9,21 +9,19 @@ const cells = []
 function postBinaryPattern() {
   const txt = $("#binaryOutput").html().replaceAll("<br>", "\r\n");
 
-  console.log(txt);
-
-  fetch('/update', {
-    method: 'POST',
-    body: JSON.stringify({
-      title: 'binary',
-      body: txt,
-      userId: 1,
-    }),
-    headers: {
-      'Content-type': 'application/json; charset=UTF-8',
-    },
-  })
-    .then((response) => response.json())
-    .then((json) => console.log(json));
+  // fetch('/update', {
+  //   method: 'POST',
+  //   body: JSON.stringify({
+  //     title: 'binary',
+  //     body: txt,
+  //     userId: 1,
+  //   }),
+  //   headers: {
+  //     'Content-type': 'application/json; charset=UTF-8',
+  //   },
+  // })
+  //   .then((response) => response.json())
+  //   .then((json) => console.log(json));
 }
 
 function updateBinaryPatterns() {
@@ -102,6 +100,20 @@ const scoreText = {
 
 const strip = { y: [43, 44] };
 
+const health = {
+  points: 19,
+  heart: [
+    [0, 1, 0, 1, 0],
+    [1, 1, 1, 1, 1],
+    [0, 1, 1, 1, 0],
+    [0, 0, 1, 0, 0],
+  ],
+  strip: [
+    "01010101010101010101010101010101".split("").map(Number),
+    "10101010101010101010101010101010".split("").map(Number)
+  ]
+}
+
 let spaceShipSkin = {
   A: {
     body: [
@@ -125,9 +137,35 @@ let spaceShipSkin = {
       x: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
     }
   },
+
+  B: {
+    body: [
+      [0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0],
+      [0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0],
+      [0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0],
+      [0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0],
+      [1, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 1],
+      [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+      [0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0],
+      [0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0],
+      [0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0],
+      [0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0],
+    ],
+    weapons: [
+      [34, 22],
+      [34, 9],
+    ],
+    front: {
+      y: [4, 5, 5, 5, 5, 3, 0, 3, 5, 5, 5, 5, 5, 4],
+      x: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]
+    }
+  }
 }
 
+let player = spaceShipSkin['B'];
+
 let gameIsOn = true;
+let fight = false;
 let asteroids = [];
 let asteroidSpeed = 500;
 let bullets = [];
@@ -207,7 +245,7 @@ class SpaceShip {
 
     this.xStart = Math.floor((32 - this.width) / 2); // The center of the grid
     this.yStart = 40;
-    this.coords = this.setSpawn(this.skin);
+    this.coords = this.setSpawn();
 
     this.weapons = skin["weapon"];
   }
@@ -234,17 +272,17 @@ class SpaceShip {
   move(key) {
 
     if (key === 68) {
-      spaceShipSkin["A"]["weapons"].forEach((weapon, i) => {
-        spaceShipSkin["A"]["weapons"][i][1] = weapon[1] + 1;
+      player["weapons"].forEach((weapon, i) => {
+        player["weapons"][i][1] = weapon[1] + 1;
         if (weapon[1] > 31) {
-          spaceShipSkin["A"]["weapons"][i][1] = 0;
+          player["weapons"][i][1] = 0;
         }
       });
     } else if (key === 65) {
-      spaceShipSkin["A"]["weapons"].forEach((weapon, i) => {
-        spaceShipSkin["A"]["weapons"][i][1] = weapon[1] - 1;
+      player["weapons"].forEach((weapon, i) => {
+        player["weapons"][i][1] = weapon[1] - 1;
         if (weapon[1] < 0) {
-          spaceShipSkin["A"]["weapons"][i][1] = 31;
+          player["weapons"][i][1] = 31;
         }
       });
     }
@@ -342,7 +380,15 @@ $(document).ready(() => {
     if (firstLoad) {
       handleAsteroids();
       handleSpaceShip();
-      // handleBinaryPattern();
+    }
+
+    firstLoad = false;
+  });
+
+  $("#fightBtn").on("click", () => {
+    if (firstLoad) {
+      fight = true;
+      handleSpaceShip();
     }
 
     firstLoad = false;
@@ -418,27 +464,55 @@ function updateScore(score=0) {
 async function handleSpaceShip() {
   // await delay(2000) // Allows the grid to load;
 
-  scoreText.font.forEach((txt, i) => {
-    for (let j=0; j<txt.length; j++) {
-      if (txt[j] === "1") {
-        cells[scoreText.y + i][scoreText.x + j].addClass("cell--active");
+  if (fight) {
+    health.heart.forEach((v, i) => {
+      for (let j=0; j<v.length; j++) {
+        if (v[j] === 1) {
+          cells[1 + i][4 + j].addClass("cell--active");
+          cells[59 + i][4 + j].addClass("cell--active");
+        }
+      }
+    })
+
+    for (let i=0; i<2; i++) {
+      for (let j=0; j<health.points; j++) {
+        cells[2 + i][10 + j].addClass("cell--active");
+        cells[60 + i][10 + j].addClass("cell--active");
       }
     }
-  });
 
-  updateScore();
+    health.strip.forEach((v, i) => {
+      for (let j=0; j<v.length; j++) {
+        if (v[j] === 1) {
+          cells[7 + i][j].addClass("cell--active");
+          cells[55 + i][j].addClass("cell--active");
+        }
+      }
+    })
 
-  strip.y.forEach(col => {
-    for (let i=0; i<32; i++) {
-      cells[col][i].addClass("cell--active");
-    }
-  });
+  } else {
+    scoreText.font.forEach((txt, i) => {
+      for (let j=0; j<txt.length; j++) {
+        if (txt[j] === "1") {
+          cells[scoreText.y + i][scoreText.x + j].addClass("cell--active");
+        }
+      }
+    });
+  
+    updateScore();
+  
+    strip.y.forEach(col => {
+      for (let i=0; i<32; i++) {
+        cells[col][i].addClass("cell--active");
+      }
+    });
+  }
 
-  const spaceShip = new SpaceShip(spaceShipSkin['A']);
+  const spaceShip = new SpaceShip(player);
 
   $(document).on("keydown", ({which}) => {
     if (which === 32) {
-      spaceShipSkin["A"]["weapons"].forEach(weapon => {
+      player["weapons"].forEach(weapon => {
         const bullet = new Bullet(weapon[1], weapon[0]);
         bullets.push(bullet);
       });
@@ -485,9 +559,9 @@ async function handleSpaceShip() {
         }
       }
 
-      for (let k=0; k < spaceShipSkin["A"]["front"]["x"].length; k++) {
-        const sX = spaceShipSkin["A"]["front"]["x"][k];
-        const sY = spaceShipSkin["A"]["front"]["y"][k];
+      for (let k=0; k < player["front"]["x"].length; k++) {
+        const sX = player["front"]["x"][k];
+        const sY = player["front"]["y"][k];
 
         const cX = spaceShip.coords[spaceShip.coords.length - 1 - sY][sX][0];
         const cY = spaceShip.coords[spaceShip.coords.length - 1 - sY][sX][1];
