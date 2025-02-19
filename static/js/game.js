@@ -251,6 +251,7 @@ class SpaceShip {
     this.coords = this.setSpawn();
 
     this.weapons = skin["weapons"];
+    this.health = 19;
   }
 
   setSpawn() {
@@ -439,6 +440,22 @@ async function handleAsteroids() {
   }
 }
 
+//2, 10
+//60, 10
+function updateHealthBar(spaceShip, [y, x]) {
+  for (let i=0; i<2; i++) {
+    for (let j=0; j<spaceShip.health + 1; j++) {
+      cells[y + i][x + j].removeClass("cell--active");
+    }
+  }
+
+  for (let i=0; i<2; i++) {
+    for (let j=0; j<spaceShip.health; j++) {
+      cells[y + i][x + j].addClass("cell--active");
+    }
+  }
+}
+
 function updateScore(score=0) {
   let scoreInput;
 
@@ -484,13 +501,6 @@ async function handleSpaceShip() {
       }
     })
 
-    for (let i=0; i<2; i++) {
-      for (let j=0; j<health.points; j++) {
-        cells[2 + i][10 + j].addClass("cell--active");
-        cells[60 + i][10 + j].addClass("cell--active");
-      }
-    }
-
     health.strip.forEach((v, i) => {
       for (let j=0; j<v.length; j++) {
         if (v[j] === 1) {
@@ -522,12 +532,25 @@ async function handleSpaceShip() {
   if (fight) {
     spaceShip = new SpaceShip(player, 52);
     enemySpaceShip = new SpaceShip(spaceShipSkin["B"], 20);
+    updateHealthBar(spaceShip, [60, 10]);
+    updateHealthBar(enemySpaceShip, [2, 10]);
   } else {
     spaceShip = new SpaceShip(player, 40);
   }
 
-  $(document).on("keydown", ({which}) => {
+  let lastShotTime = 0; // Tracks the last shooting time
+  const shotCooldown = 500; // Cooldown in milliseconds
+  
+  $(document).on("keydown", ({ which }) => {
+    const now = Date.now();
+  
     if (which === 32) {
+      if (fight && now - lastShotTime < shotCooldown) {
+        return; // Ignore fast repeated shots
+      }
+  
+      lastShotTime = now; // Update the last shot time
+  
       player["weapons"].forEach(weapon => {
         const bullet = new Bullet(weapon[1], weapon[0], spaceShip.yStart - spaceShip.skin.length);
         bullets.push(bullet);
@@ -536,10 +559,10 @@ async function handleSpaceShip() {
       spaceShip.move(which);
     }
   });
-
+  
   while (gameIsOn) {
     if (fight) {
-      await delay(300);
+      await delay(70);
     } else {
       await delay(50);
     }
@@ -557,20 +580,20 @@ async function handleSpaceShip() {
     if (fight) {
       // Move enemy spaceship
       const dirChange = getRandomInt(0, 100);
-      if (dirChange < 75) { // 75% chance of being still
-      } else if (dirChange < 87.5) { // 12.5% chance of moving left
+      if (dirChange < 20) { // 75% chance of being still
+      } else if (dirChange < 60) { // 12.5% chance of moving left
         enemySpaceShip.move(65);
       } else { // 12.5% chance of moving right
         enemySpaceShip.move(68);
       }
 
       // Shoot enemy bullets
-      // if (getRandomInt(0, 100) > 75) {
-      //   spaceShipSkin["B"]["weapons"].forEach(weapon => {
-      //     const bullet = new Bullet(weapon[1], weapon[0], enemySpaceShip.yStart - enemySpaceShip.skin.length);
-      //     enemyBullets.push(bullet);
-      //   });
-      // }
+      if (getRandomInt(0, 100) > 30) {
+        spaceShipSkin["B"]["weapons"].forEach(weapon => {
+          const bullet = new Bullet(weapon[1], weapon[0], enemySpaceShip.yStart - enemySpaceShip.skin.length);
+          enemyBullets.push(bullet);
+        });
+      }
 
       enemyBullets.forEach(bullet => {
         bullet.move(54, -1);
@@ -578,7 +601,7 @@ async function handleSpaceShip() {
 
       enemyBullets = Bullet.cleanSpace(enemyBullets);  
 
-      const enemyBulletsCopy = [1, ...enemyBullets];
+      const enemyBulletsCopy = [...enemyBullets];
       const playerBulletsCopy = [...bullets];
       
       const enemyIndexesToRemove = new Set();
@@ -587,13 +610,11 @@ async function handleSpaceShip() {
       for (let i = enemyBulletsCopy.length - 1; i >= 0; i--) {
         const eX = enemyBulletsCopy[i].xPos;
         const eY = enemyBulletsCopy[i].yPos;
-        let pX;
-        let pY;
 
         for (let j = playerBulletsCopy.length - 1; j >= 0; j--) {
           const pX = playerBulletsCopy[j].xPos;
           const pY = playerBulletsCopy[j].yPos;
-      
+          
           if (eX === pX && eY === pY) {
             enemyIndexesToRemove.add(i);
             playerIndexesToRemove.add(j);
@@ -601,36 +622,32 @@ async function handleSpaceShip() {
           }
         }
 
-        for (let k=0; k < spaceShipSkin["B"]["front"]["x"].length; k++) {
-          const sX = spaceShipSkin["B"]["front"]["x"][k];
-          const sY = spaceShipSkin["B"]["front"]["y"][k];
+        // Player spaceship collision
+        for (let k=0; k < player["front"]["x"].length; k++) {
+          const sX = player["front"]["x"][k];
+          const sY = player["front"]["y"][k];
     
-          const cX = enemySpaceShip.coords[enemySpaceShip.coords.length - 1 - sY][sX][0];
-          const cY = enemySpaceShip.coords[enemySpaceShip.coords.length - 1 - sY][sX][1];
+          const cX = spaceShip.coords[spaceShip.coords.length - 1 - sY][sX][0];
+          const cY = spaceShip.coords[spaceShip.coords.length - 1 - sY][sX][1];
+      
+          if ((cX === eX) && (cY === eY)) {
+            if (spaceShip.health > 1) {
+              spaceShip.health -= 1;
+              updateHealthBar(spaceShip, [60, 10]);
 
-          if ((cX === pX) && (cY === pY)) {
-            gameIsOn = false;
-            console.log("Game Over!");
-            return;
+              // Mark the bullet for removal
+              enemyIndexesToRemove.add(i);
+            } else {
+              gameIsOn = false;
+              console.log("Game Over!");
+              return;
+            }
           }
         }
-
-        // SpaceShip collisions
-        // for (let k=0; k < player["front"]["x"].length; k++) {
-        //   const sX = player["front"]["x"][k];
-        //   const sY = player["front"]["y"][k];
-    
-        //   const cX = spaceShip.coords[spaceShip.coords.length - 1 - sY][sX][0];
-        //   const cY = spaceShip.coords[spaceShip.coords.length - 1 - sY][sX][1];
-      
-        //   if ((cX === eX) && (cY === eY)) {
-        //     gameIsOn = false;
-        //     console.log("Game Over!");
-        //     return;
-        //   }
-        // }
       }
       
+      handleEnemyShip();
+
       // Remove marked bullets safely after the loop
       enemyBullets = enemyBullets.filter((_, index) => !enemyIndexesToRemove.has(index));
       bullets = bullets.filter((_, index) => !playerIndexesToRemove.has(index));
@@ -678,6 +695,41 @@ async function handleSpaceShip() {
   }
 
   }
+}
+
+async function handleEnemyShip() {
+  const bulletsToRemove = new Set();
+
+  for (let j = bullets.length - 1; j >= 0; j--) {
+    const pX = bullets[j].xPos;
+    const pY = bullets[j].yPos;
+
+    for (let k = 0; k < spaceShipSkin["B"]["front"]["x"].length; k++) {
+      const sX = spaceShipSkin["B"]["front"]["x"][k];
+      const sY = spaceShipSkin["B"]["front"]["y"][k];
+    
+      const cX = enemySpaceShip.coords[enemySpaceShip.coords.length - 1 - sY][sX][0];
+      const cY = enemySpaceShip.coords[enemySpaceShip.coords.length - 1 - sY][sX][1];
+    
+      if (cX === pX && cY === pY) {
+        if (enemySpaceShip.health > 0) {
+          enemySpaceShip.health -= 1;
+          console.log(enemySpaceShip.health);
+          updateHealthBar(enemySpaceShip, [2, 10]);
+
+          // Mark the bullet for removal
+          bulletsToRemove.add(j);
+        } else {
+          gameIsOn = false;
+          console.log("Game Over!");
+          return;
+        }
+      }
+    }
+  }
+
+  // Remove bullets after checking all collisions
+  bullets = bullets.filter((_, index) => !bulletsToRemove.has(index));
 }
 
 function handleBinaryPattern() {
