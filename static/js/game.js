@@ -9,19 +9,19 @@ const cells = []
 function postBinaryPattern() {
   const txt = $("#binaryOutput").html().replaceAll("<br>", "\r\n");
 
-  // fetch('/update', {
-  //   method: 'POST',
-  //   body: JSON.stringify({
-  //     title: 'binary',
-  //     body: txt,
-  //     userId: 1,
-  //   }),
-  //   headers: {
-  //     'Content-type': 'application/json; charset=UTF-8',
-  //   },
-  // })
-  //   .then((response) => response.json())
-  //   .then((json) => console.log(json));
+  fetch('/update', {
+    method: 'POST',
+    body: JSON.stringify({
+      title: 'binary',
+      body: txt,
+      userId: 1,
+    }),
+    headers: {
+      'Content-type': 'application/json; charset=UTF-8',
+    },
+  })
+    .then((response) => response.json())
+    .then((json) => console.log(json));
 }
 
 function updateBinaryPatterns() {
